@@ -1,0 +1,179 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  release:
+    types:
+      - created
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint code
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version-file: pyproject.toml
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Check code formatting
+        run: black --check ./tests ./src ./.github
+
+  tests:
+    name: Test with Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    if: always()
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-build: true
+      - name: Install package in editable mode
+        run: pip install -e .
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run tests
+        run: coverage run -m pytest ./tests
+      - name: Generate report
+        if: ${{ github.event_name != 'release' }}
+        run: |
+          coverage xml
+          coverage report
+      - name: Upload coverage to Codecov
+        if: ${{ github.event_name != 'release' }}
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+
+  package_tests:
+    name: Test installed package with Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache-build: true
+      - name: Install package
+        run: pip install .
+      - name: Remove source
+        run: rm -rf ./src
+        shell: bash
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run tests
+        run: pytest ./tests
+
+  build_wheels:
+    name: Build wheel on ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version-file: pyproject.toml
+          cache-build: true
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Install build requirements
+        run: pip install -r ./requirements-build.txt
+      - name: Download ffmpeg binaries
+        run: python ./.github/ffmpeg-binaries/download_binaries.py
+      - name: Build wheel
+        run: python -m build --wheel
+      - name: Upload wheel
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheel-${{ matrix.os }}
+          path: ./dist
+
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version-file: pyproject.toml
+          cache-build: true
+      - name: Install build requirements
+        run: pip install -r ./requirements-build.txt
+      - name: Build sdist
+        run: python -m build --sdist
+      - name: Upload sdist
+        uses: actions/upload-artifact@v3
+        with:
+          name: sdist
+          path: ./dist
+
+  upload_pypi:
+    name: Upload package to PyPI
+    runs-on: ubuntu-latest
+    needs: [lint, tests, package_tests, build_wheels, build_sdist]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version-file: pyproject.toml
+          cache-build: true
+      - name: Install build requirements
+        run: pip install -r ./requirements-build.txt
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Download built files
+        uses: actions/download-artifact@v3
+        with:
+          path: ./dist
+      - name: Prepare dist folder
+        run: |
+          python ./.github/scripts/prepare_dist.py
+          tree ./dist
+      - name: Check dist files
+        run: twine check ./dist/* --strict

@@ -1,0 +1,23 @@
+[project]
+name = "static-pyffmpeg"
+authors = [{name="Matteo Dell'Acqua", email="dellacqua.matteo99@gmail.com"}]
+maintainers = [{name="Matteo Dell'Acqua", email="dellacqua.matteo99@gmail.com"}]
+description = "A static build of ffmpeg for Python"
+license = {file="LICENSE"}
+requires-python = ">=3.8"
+keywords = ["ffmpeg", "static"]
+dynamic = ["version"]
+readme = "README.md"
+
+[project.scripts]
+ffmpeg = "ffmpeg:run"
+
+[build-system]
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "ffmpeg.__version__"}
