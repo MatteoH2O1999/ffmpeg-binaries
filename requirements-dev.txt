@@ -3,3 +3,4 @@ coverage
 requests
 patool
 pytest
+GitPython

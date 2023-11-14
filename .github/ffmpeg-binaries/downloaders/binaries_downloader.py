@@ -1,3 +1,4 @@
+import functools
 import os
 import shutil
 import subprocess
@@ -26,6 +27,7 @@ class BinariesJSON(TypedDict):
     url: BinariesURL
 
 
+@functools.total_ordering
 class SemverVersion:
     def __init__(self, string_version: str):
         split_version = string_version.split(".")
@@ -44,6 +46,20 @@ class SemverVersion:
             and self.minor == other.minor
             and self.patch == other.patch
         )
+
+    def __gt__(self, other):
+        if not isinstance(other, SemverVersion):
+            raise NotImplementedError
+        if self.major == other.major:
+            if self.minor == other.minor:
+                if self.patch == other.patch:
+                    return False
+                else:
+                    return self.patch > other.patch
+            else:
+                return self.minor > other.minor
+        else:
+            return self.major > other.major
 
     def __str__(self):
         return f"{self.major}.{self.minor}.{self.patch}"

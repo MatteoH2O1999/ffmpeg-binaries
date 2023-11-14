@@ -1,0 +1,35 @@
+name: Update data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * 0
+
+jobs:
+  update_cpython_tags:
+    runs-on: ubuntu-latest
+    name: Update ffmpeg JSON binaries
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+      - name: Setup Python
+        uses: MatteoH2O1999/setup-python@v2
+        with:
+          python-version-file: pyproject.toml
+      - name: Install dependencies
+        run: pip install -r ./requirements-dev.txt
+      - name: Update JSON binaries
+        run: python ./.github/ffmpeg-binaries/update_binaries.py
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: Update JSON binaries
+          branch: create-pull-request/binaries-json
+          delete-branch: true
+          title: Update JSON binaries
+          body: |
+            Automated JSON data update by [update_data.yml](https://github.com/MatteoH2O1999/pyffmpeg/tree/master/.github/workflows/update_data.yml)
+          assignees: ${{ github.repository_owner }}
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
