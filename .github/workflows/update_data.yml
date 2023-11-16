@@ -18,10 +18,12 @@ jobs:
         uses: MatteoH2O1999/setup-python@v2
         with:
           python-version-file: pyproject.toml
+      - name: Install package in editable mode
+        run: pip install -e .
       - name: Install dependencies
         run: pip install -r ./requirements-dev.txt
       - name: Update JSON binaries
-        run: python ./.github/ffmpeg-binaries/update_binaries.py
+        run: python ./.github/scripts/update_binaries.py
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@v5
         with:

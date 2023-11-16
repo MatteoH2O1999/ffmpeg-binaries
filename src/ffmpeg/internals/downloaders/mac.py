@@ -2,10 +2,10 @@ import os
 import pathlib
 
 from typing import Union
-from .downloader import Downloader
+from .downloader import _Downloader
 
 
-class MacDownloader(Downloader):
+class _MacDownloader(_Downloader):
     def extract(self) -> None:
         pass
 

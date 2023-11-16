@@ -3,10 +3,10 @@ import pathlib
 import shutil
 
 from typing import Union
-from .downloader import Downloader
+from .downloader import _Downloader
 
 
-class WinDownloader(Downloader):
+class _WinDownloader(_Downloader):
     def extract(self) -> None:
         directories = os.listdir(self.dst)
         if len(directories) != 1:

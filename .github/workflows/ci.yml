@@ -112,12 +112,14 @@ jobs:
         with:
           python-version-file: pyproject.toml
           cache-build: true
+      - name: Install package in editable mode
+        run: pip install -e .
       - name: Install development dependencies
         run: pip install -r requirements-dev.txt
       - name: Install build requirements
         run: pip install -r ./requirements-build.txt
       - name: Download ffmpeg binaries
-        run: python ./.github/ffmpeg-binaries/download_binaries.py
+        run: python ./.github/scripts/download_binaries.py
       - name: Build wheel
         run: python -m build --wheel
       - name: Upload wheel
@@ -127,7 +129,7 @@ jobs:
           path: ./dist
 
   build_sdist:
-    name: Build sdist
+    name: Build universal wheel and sdist
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -141,9 +143,11 @@ jobs:
           cache-build: true
       - name: Install build requirements
         run: pip install -r ./requirements-build.txt
-      - name: Build sdist
-        run: python -m build --sdist
-      - name: Upload sdist
+      - name: Build universal wheel and sdist
+        run: python -m build
+        env:
+          BUILD: universal
+      - name: Upload universal wheel and sdist
         uses: actions/upload-artifact@v3
         with:
           name: sdist

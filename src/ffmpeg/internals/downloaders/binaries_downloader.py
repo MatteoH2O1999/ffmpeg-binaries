@@ -1,4 +1,5 @@
 import functools
+import json
 import os
 import shutil
 import subprocess
@@ -7,28 +8,28 @@ import pathlib
 import re
 
 from typing import TypedDict, Union
-from .downloader import Downloader
-from .mac import MacDownloader
-from .nix import NixDownloader
-from .win import WinDownloader
+from .downloader import _Downloader
+from .mac import _MacDownloader
+from .nix import _NixDownloader
+from .win import _WinDownloader
 
 
 FFMPEG_RE = re.compile(r"ffmpeg version (?P<version>\d+\.?\d*\.?\d*)")
 
 
-class BinariesURL(TypedDict):
+class _BinariesURL(TypedDict):
     win: list[str]
     nix: list[str]
     mac: list[str]
 
 
-class BinariesJSON(TypedDict):
+class _BinariesJSON(TypedDict):
     version: str
-    url: BinariesURL
+    url: _BinariesURL
 
 
 @functools.total_ordering
-class SemverVersion:
+class _SemverVersion:
     def __init__(self, string_version: str):
         split_version = string_version.split(".")
         while len(split_version) != 3:
@@ -39,7 +40,7 @@ class SemverVersion:
         self.patch = int(split_version[2])
 
     def __eq__(self, other):
-        if not isinstance(other, SemverVersion):
+        if not isinstance(other, _SemverVersion):
             return False
         return (
             self.major == other.major
@@ -48,7 +49,7 @@ class SemverVersion:
         )
 
     def __gt__(self, other):
-        if not isinstance(other, SemverVersion):
+        if not isinstance(other, _SemverVersion):
             raise NotImplementedError
         if self.major == other.major:
             if self.minor == other.minor:
@@ -65,33 +66,56 @@ class SemverVersion:
         return f"{self.major}.{self.minor}.{self.patch}"
 
 
-def test_version(executable: Union[bytes, str, os.PathLike]) -> SemverVersion:
+def _test_version(executable: Union[bytes, str, os.PathLike]) -> _SemverVersion:
     call = subprocess.run([executable, "-version"], capture_output=True)
     match = FFMPEG_RE.match(call.stdout.decode("utf-8"))
-    return SemverVersion(match.group("version"))
+    return _SemverVersion(match.group("version"))
 
 
-def download_binaries(json_data: BinariesJSON) -> None:
-    root = pathlib.Path(__file__).parent.parent.parent.parent
-    src_folder = root.joinpath("src")
-    package_folder = src_folder.joinpath("ffmpeg")
+def _download_binaries(json_data: _BinariesJSON) -> None:
+    package_folder = pathlib.Path(__file__).parent.parent.parent
     binaries_folder = package_folder.joinpath("binaries")
     if binaries_folder.exists():
         shutil.rmtree(binaries_folder)
     os.mkdir(binaries_folder)
 
-    version = SemverVersion(json_data["version"])
-    downloader: Downloader
+    version = _SemverVersion(json_data["version"])
+    downloader: _Downloader
     platform = sys.platform
     if platform in ["win32", "cygwin"]:
-        downloader = WinDownloader(json_data["url"]["win"], binaries_folder)
+        downloader = _WinDownloader(json_data["url"]["win"], binaries_folder)
     elif platform == "darwin":
-        downloader = MacDownloader(json_data["url"]["mac"], binaries_folder)
+        downloader = _MacDownloader(json_data["url"]["mac"], binaries_folder)
     elif platform == "linux":
-        downloader = NixDownloader(json_data["url"]["nix"], binaries_folder)
+        downloader = _NixDownloader(json_data["url"]["nix"], binaries_folder)
     else:
         raise RuntimeError(f"Binaries for platform {platform} not supported")
     downloader.run()
-    downloaded_version = test_version(downloader.ffmpeg)
+    downloaded_version = _test_version(downloader.ffmpeg)
     if downloaded_version != version:
         raise RuntimeError(f"Expected version {version}. Got {downloaded_version}")
+
+
+def download_binaries() -> None:
+    json_file_path = pathlib.Path(__file__).parent.joinpath("binaries.json")
+    with open(json_file_path) as json_file:
+        json_content = json.load(json_file)
+    _download_binaries(json_content)
+
+
+def get_binaries() -> Union[pathlib.Path, None]:
+    package_folder = pathlib.Path(__file__).parent.parent.parent
+    binaries_folder = package_folder.joinpath("binaries")
+    platform = sys.platform
+    if platform in ["win32", "cygwin"]:
+        downloader = _WinDownloader([], binaries_folder)
+    elif platform == "darwin":
+        downloader = _MacDownloader([], binaries_folder)
+    elif platform == "linux":
+        downloader = _NixDownloader([], binaries_folder)
+    else:
+        raise RuntimeError(f"Binaries for platform {platform} not supported")
+    candidate_path = pathlib.Path(downloader.ffmpeg)
+    if candidate_path.exists() and candidate_path.is_file():
+        return candidate_path
+    return None

@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from typing import Union
 
 
-class Downloader(ABC):
+class _Downloader(ABC):
     def __init__(self, url: list[str], dst: Union[bytes, str, os.PathLike]):
         self.url = url
         self.dst: pathlib.Path = pathlib.Path(dst)

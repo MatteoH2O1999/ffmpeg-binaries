@@ -1,6 +1,4 @@
 black==23.11.0
 coverage
-requests
-patool
 pytest
 GitPython

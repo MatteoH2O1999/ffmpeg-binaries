@@ -7,12 +7,16 @@ import time
 
 from typing import List, Union
 
-from downloaders.binaries_downloader import BinariesJSON, BinariesURL, SemverVersion
+from ffmpeg.internals.downloaders.binaries_downloader import (
+    _BinariesJSON,
+    _BinariesURL,
+    _SemverVersion,
+)
 
 
 def gather_tags() -> List[str]:
     tags = []
-    semantic_tags: List[SemverVersion] = []
+    semantic_tags: List[_SemverVersion] = []
     with tempfile.TemporaryDirectory() as temp_dir:
         print("Downloading ffmpeg repo...")
         python_repo = git.Repo.clone_from("https://git.ffmpeg.org/ffmpeg.git", temp_dir)
@@ -21,7 +25,7 @@ def gather_tags() -> List[str]:
         for tag in repo_tags:
             tag = tag.name.replace("n", "")
             try:
-                semantic_tags.append(SemverVersion(tag))
+                semantic_tags.append(_SemverVersion(tag))
             except ValueError:
                 pass
     print("Sorting tags...")
@@ -32,16 +36,23 @@ def gather_tags() -> List[str]:
 
 
 def update_binaries(ffmpeg_tags: List[str]):
-    json_path = pathlib.Path(__file__).parent.joinpath("binaries.json")
+    json_path = (
+        pathlib.Path(__file__)
+        .parent.parent.parent.joinpath("src")
+        .joinpath("ffmpeg")
+        .joinpath("internals")
+        .joinpath("downloaders")
+        .joinpath("binaries.json")
+    )
     with open(json_path) as json_file:
-        binaries: BinariesJSON = json.load(json_file)
-        version: SemverVersion = SemverVersion(binaries["version"])
+        binaries: _BinariesJSON = json.load(json_file)
+        version: _SemverVersion = _SemverVersion(binaries["version"])
     print(f"Current version: {version}", flush=True)
     print(f"Current binaries:\n{json.dumps(binaries['url'], indent=2)}\n", flush=True)
     current_best = version
     current_url = binaries["url"]
     for tag in ffmpeg_tags:
-        tag = SemverVersion(tag)
+        tag = _SemverVersion(tag)
         if tag <= current_best:
             print(
                 f"Already reached latest version with tag {tag}. Stopping...",
@@ -54,12 +65,15 @@ def update_binaries(ffmpeg_tags: List[str]):
         if candidate is not None and tag > current_best:
             current_url = candidate
             current_best = tag
-    new_binaries_json: BinariesJSON = {"version": str(current_best), "url": current_url}
+    new_binaries_json: _BinariesJSON = {
+        "version": str(current_best),
+        "url": current_url,
+    }
     with open(json_path, "w") as json_file:
         json.dump(new_binaries_json, json_file, indent=2)
 
 
-def try_version(version: SemverVersion) -> Union[None, BinariesURL]:
+def try_version(version: _SemverVersion) -> Union[None, _BinariesURL]:
     patch_dict = get_urls(f"{version.major}.{version.minor}.{version.patch}")
     minor_dict = get_urls(f"{version.major}.{version.minor}")
     major_dict = get_urls(f"{version.major}")
@@ -71,7 +85,7 @@ def try_version(version: SemverVersion) -> Union[None, BinariesURL]:
         return major_dict
 
 
-def get_urls(version: str) -> BinariesURL:
+def get_urls(version: str) -> _BinariesURL:
     return {
         "win": [
             f"https://github.com/GyanD/codexffmpeg/releases/download/{version}/ffmpeg-{version}-full_build.7z"
@@ -86,9 +100,9 @@ def get_urls(version: str) -> BinariesURL:
     }
 
 
-def try_url(urls: BinariesURL) -> bool:
+def try_url(urls: _BinariesURL) -> bool:
     print(f"Trying binaries:\n{json.dumps(urls, indent=2)}", flush=True)
-    url_list = [*urls["mac"], *urls["win"], *urls["nix"]]
+    url_list = [*urls["nix"], *urls["win"], *urls["mac"]]
     for url in url_list:
         print(f"Checking url: {url}", flush=True)
         success = False
