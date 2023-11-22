@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-ffmpeg = "ffmpeg:run"
+ffmpeg = "ffmpeg.executable:_run"
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
