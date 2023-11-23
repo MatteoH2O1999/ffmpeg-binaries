@@ -3,9 +3,10 @@ import pathlib
 import warnings
 
 from .internals import download_binaries, get_binaries
+from typing import Union
 
 
-def get_executable_path(ensure_binaries: bool = False) -> pathlib.Path | None:
+def get_executable_path(ensure_binaries: bool = False) -> Union[pathlib.Path, None]:
     binaries_path = get_binaries()
     if binaries_path is None and ensure_binaries:
         warnings.warn("ffmpeg binaries not found. Will download binaries now.")

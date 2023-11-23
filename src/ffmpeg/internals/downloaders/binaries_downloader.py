@@ -7,7 +7,7 @@ import sys
 import pathlib
 import re
 
-from typing import TypedDict, Union
+from typing import List, TypedDict, Union
 from .downloader import _Downloader
 from .mac import _MacDownloader
 from .nix import _NixDownloader
@@ -18,9 +18,9 @@ FFMPEG_RE = re.compile(r"ffmpeg version (?P<version>\d+\.?\d*\.?\d*)")
 
 
 class _BinariesURL(TypedDict):
-    win: list[str]
-    nix: list[str]
-    mac: list[str]
+    win: List[str]
+    nix: List[str]
+    mac: List[str]
 
 
 class _BinariesJSON(TypedDict):

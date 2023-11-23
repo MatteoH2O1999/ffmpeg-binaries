@@ -5,11 +5,11 @@ import patoolib
 import requests
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import List, Union
 
 
 class _Downloader(ABC):
-    def __init__(self, url: list[str], dst: Union[bytes, str, os.PathLike]):
+    def __init__(self, url: List[str], dst: Union[bytes, str, os.PathLike]):
         self.url = url
         self.dst: pathlib.Path = pathlib.Path(dst)
 
