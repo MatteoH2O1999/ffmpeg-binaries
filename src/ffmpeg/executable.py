@@ -13,7 +13,6 @@ def get_executable_path(ensure_binaries: bool = False) -> pathlib.Path | None:
         binaries_path = get_binaries()
         if binaries_path is None:
             raise RuntimeError("Could not download correct ffmpeg binaries.")
-        return binaries_path
     return binaries_path
 
 
