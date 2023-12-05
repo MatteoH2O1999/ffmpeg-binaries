@@ -88,7 +88,7 @@ def try_version(version: _SemverVersion) -> Union[None, _BinariesURL]:
 def get_urls(version: str) -> _BinariesURL:
     return {
         "win": [
-            f"https://github.com/GyanD/codexffmpeg/releases/download/{version}/ffmpeg-{version}-full_build.7z"
+            f"https://github.com/GyanD/codexffmpeg/releases/download/{version}/ffmpeg-{version}-essentials_build.7z"
         ],
         "mac": [
             f"https://evermeet.cx/ffmpeg/ffmpeg-{version}.7z",
