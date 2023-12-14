@@ -23,7 +23,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version-file: pyproject.toml
       - name: Install development dependencies
@@ -46,7 +46,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python ${{ matrix.python-version }}
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
           cache-build: true
@@ -81,7 +81,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python ${{ matrix.python-version }}
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
           cache-build: true
@@ -108,7 +108,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python ${{ matrix.python-version }}
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version-file: pyproject.toml
           cache-build: true
@@ -137,7 +137,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python ${{ matrix.python-version }}
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version-file: pyproject.toml
           cache-build: true
@@ -167,7 +167,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup Python ${{ matrix.python-version }}
-        uses: MatteoH2O1999/setup-python@v2
+        uses: MatteoH2O1999/setup-python@v3
         with:
           python-version-file: pyproject.toml
           cache-build: true
