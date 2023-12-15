@@ -123,7 +123,7 @@ jobs:
       - name: Build wheel
         run: python -m build --wheel
       - name: Upload wheel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheel-${{ matrix.os }}
           path: ./dist
@@ -148,7 +148,7 @@ jobs:
         env:
           BUILD: universal
       - name: Upload universal wheel and sdist
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sdist
           path: ./dist
