@@ -8,12 +8,15 @@ from unittest.mock import patch
 
 def test_executable_constant_if_binaries_installed():
     with patch("ffmpeg.executable.get_binaries") as mock_get_binaries:
-        p = pathlib.Path("binaries")
-        mock_get_binaries.return_value = p
+        b = pathlib.Path("binary")
+        p = pathlib.Path("probe")
+        mock_get_binaries.return_value = (b, p)
 
         importlib.reload(ffmpeg)
 
-        assert ffmpeg.FFMPEG_PATH is p
+        assert ffmpeg.FFMPEG_PATH is b
+        assert ffmpeg.FFPROBE_PATH is p
+        assert ffmpeg.FFMPEG_FOLDER == p.parent
 
 
 def test_executable_constant_if_binaries_not_installed():
@@ -25,6 +28,8 @@ def test_executable_constant_if_binaries_not_installed():
         importlib.reload(ffmpeg)
 
         assert ffmpeg.FFMPEG_PATH is None
+        assert ffmpeg.FFPROBE_PATH is None
+        assert ffmpeg.FFMPEG_FOLDER is None
         assert len(w) == 1
         warning = w[0].message
         assert isinstance(warning, Warning)
@@ -33,12 +38,15 @@ def test_executable_constant_if_binaries_not_installed():
 
 def test_init():
     with patch("ffmpeg.get_executable_path") as mock_get_executable:
-        p = pathlib.Path("binaries")
-        mock_get_executable.return_value = p
+        b = pathlib.Path("binary")
+        p = pathlib.Path("probe")
+        mock_get_executable.return_value = (b, p)
 
         ffmpeg.init()
 
-        assert ffmpeg.FFMPEG_PATH is p
+        assert ffmpeg.FFMPEG_PATH is b
+        assert ffmpeg.FFPROBE_PATH is p
+        assert ffmpeg.FFMPEG_FOLDER == p.parent
         mock_get_executable.assert_called_once()
         mock_get_executable.assert_called_with(ensure_binaries=True)
 
