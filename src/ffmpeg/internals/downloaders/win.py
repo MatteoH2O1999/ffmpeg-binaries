@@ -25,3 +25,7 @@ class _WinDownloader(_Downloader):
     @property
     def ffmpeg(self) -> Union[bytes, str, os.PathLike]:
         return pathlib.Path(self.dst).joinpath("bin").joinpath("ffmpeg.exe")
+
+    @property
+    def ffprobe(self) -> Union[bytes, str, os.PathLike]:
+        return pathlib.Path(self.dst).joinpath("bin").joinpath("ffprobe.exe")

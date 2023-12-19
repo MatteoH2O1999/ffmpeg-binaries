@@ -34,3 +34,8 @@ class _Downloader(ABC):
     @abstractmethod
     def ffmpeg(self) -> Union[bytes, str, os.PathLike]:
         pass
+
+    @property
+    @abstractmethod
+    def ffprobe(self) -> Union[bytes, str, os.PathLike]:
+        pass

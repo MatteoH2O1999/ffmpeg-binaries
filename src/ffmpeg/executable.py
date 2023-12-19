@@ -3,10 +3,12 @@ import pathlib
 import warnings
 
 from .internals import download_binaries, get_binaries
-from typing import Union
+from typing import Tuple, Union
 
 
-def get_executable_path(ensure_binaries: bool = False) -> Union[pathlib.Path, None]:
+def get_executable_path(
+    ensure_binaries: bool = False,
+) -> Tuple[Union[pathlib.Path, None], Union[pathlib.Path, None]]:
     binaries_path = get_binaries()
     if binaries_path is None and ensure_binaries:
         warnings.warn("ffmpeg binaries not found. Will download binaries now.")
@@ -14,11 +16,13 @@ def get_executable_path(ensure_binaries: bool = False) -> Union[pathlib.Path, No
         binaries_path = get_binaries()
         if binaries_path is None:
             raise RuntimeError("Could not download correct ffmpeg binaries.")
+    if binaries_path is None:
+        return None, None
     return binaries_path
 
 
 def add_to_path() -> None:
-    path_to_add = get_executable_path(ensure_binaries=True)
+    path_to_add = get_executable_path(ensure_binaries=True)[0]
     os.environ["PATH"] = f"{str(path_to_add)}{os.pathsep}{os.environ['PATH']}"
 
 
@@ -26,4 +30,4 @@ def _run() -> None:
     import subprocess
     import sys
 
-    subprocess.run([str(get_executable_path(ensure_binaries=True)), *sys.argv[1:]])
+    subprocess.run([str(get_executable_path(ensure_binaries=True)[0]), *sys.argv[1:]])

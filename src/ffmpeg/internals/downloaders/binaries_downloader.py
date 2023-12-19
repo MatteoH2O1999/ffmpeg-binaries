@@ -7,7 +7,7 @@ import sys
 import pathlib
 import re
 
-from typing import List, TypedDict, Union
+from typing import List, TypedDict, Tuple, Union
 from .downloader import _Downloader
 from .mac import _MacDownloader
 from .nix import _NixDownloader
@@ -103,7 +103,7 @@ def download_binaries() -> None:
     _download_binaries(json_content)
 
 
-def get_binaries() -> Union[pathlib.Path, None]:
+def get_binaries() -> Union[Tuple[pathlib.Path, pathlib.Path], None]:
     package_folder = pathlib.Path(__file__).parent.parent.parent
     binaries_folder = package_folder.joinpath("binaries")
     platform = sys.platform
@@ -115,7 +115,13 @@ def get_binaries() -> Union[pathlib.Path, None]:
         downloader = _NixDownloader([], binaries_folder)
     else:
         raise RuntimeError(f"Binaries for platform {platform} not supported")
-    candidate_path = pathlib.Path(downloader.ffmpeg)
-    if candidate_path.exists() and candidate_path.is_file():
-        return candidate_path
+    candidate_bin = pathlib.Path(downloader.ffmpeg)
+    candidate_probe = pathlib.Path(downloader.ffprobe)
+    if (
+        candidate_bin.exists()
+        and candidate_bin.is_file()
+        and candidate_probe.exists()
+        and candidate_probe.is_file()
+    ):
+        return candidate_bin, candidate_probe
     return None
