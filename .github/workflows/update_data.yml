@@ -25,7 +25,7 @@ jobs:
       - name: Update JSON binaries
         run: python ./.github/scripts/update_binaries.py
       - name: Create or update pull request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           commit-message: Update JSON binaries
           branch: create-pull-request/binaries-json
