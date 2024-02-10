@@ -2,7 +2,7 @@ import warnings
 
 from .executable import get_executable_path
 
-__version__ = "0.0.2"
+__version__ = "1.0.0"
 
 FFMPEG_PATH, FFPROBE_PATH = get_executable_path()
 if FFMPEG_PATH is None:
