@@ -9,6 +9,9 @@ jobs:
   update_cpython_tags:
     runs-on: ubuntu-latest
     name: Update ffmpeg JSON binaries
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

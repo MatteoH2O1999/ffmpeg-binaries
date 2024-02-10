@@ -65,10 +65,12 @@ def update_binaries(ffmpeg_tags: List[str]):
         if candidate is not None and tag > current_best:
             current_url = candidate
             current_best = tag
+            break
     new_binaries_json: _BinariesJSON = {
         "version": str(current_best),
         "url": current_url,
     }
+    print(f"New version: {current_best}", flush=True)
     with open(json_path, "w") as json_file:
         json.dump(new_binaries_json, json_file, indent=2)
 
@@ -79,10 +81,15 @@ def try_version(version: _SemverVersion) -> Union[None, _BinariesURL]:
     major_dict = get_urls(f"{version.major}")
     if try_url(patch_dict):
         return patch_dict
+    if version.patch != 0:
+        return None
     if try_url(minor_dict):
         return minor_dict
+    if version.minor != 0:
+        return None
     if try_url(major_dict):
         return major_dict
+    return None
 
 
 def get_urls(version: str) -> _BinariesURL:
@@ -90,12 +97,12 @@ def get_urls(version: str) -> _BinariesURL:
         "win": [
             f"https://github.com/GyanD/codexffmpeg/releases/download/{version}/ffmpeg-{version}-essentials_build.7z"
         ],
+        "nix": [
+            f"https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-{version}-amd64-static.tar.xz"
+        ],
         "mac": [
             f"https://evermeet.cx/ffmpeg/ffmpeg-{version}.7z",
             f"https://evermeet.cx/ffmpeg/ffprobe-{version}.7z",
-        ],
-        "nix": [
-            f"https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-{version}-amd64-static.tar.xz"
         ],
     }
 
