@@ -1,4 +1,3 @@
-import os
 import pathlib
 import warnings
 
@@ -19,11 +18,6 @@ def get_executable_path(
     if binaries_path is None:
         return None, None
     return binaries_path
-
-
-def add_to_path() -> None:
-    path_to_add = get_executable_path(ensure_binaries=True)[0]
-    os.environ["PATH"] = f"{str(path_to_add)}{os.pathsep}{os.environ['PATH']}"
 
 
 def _run() -> None:

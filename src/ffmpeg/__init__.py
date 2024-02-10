@@ -1,6 +1,6 @@
 import warnings
 
-from .executable import add_to_path, get_executable_path
+from .executable import get_executable_path
 
 __version__ = "0.0.2"
 
@@ -24,3 +24,39 @@ def init() -> None:
     global FFMPEG_PATH, FFPROBE_PATH, FFMPEG_FOLDER
     FFMPEG_PATH, FFPROBE_PATH = get_executable_path(ensure_binaries=True)
     FFMPEG_FOLDER = FFMPEG_PATH.parent
+
+
+def add_to_path() -> None:
+    import os
+
+    if FFMPEG_FOLDER is None:
+        init()
+    os.environ["PATH"] = f"{str(FFMPEG_FOLDER)}{os.pathsep}{os.environ['PATH']}"
+
+
+def use_ffmpeg(ffmpeg_path: str, ffprobe_path: str) -> None:
+    import pathlib
+
+    if not ffmpeg_path or not ffprobe_path:
+        raise ValueError("Both paths must be specified")
+
+    ffmpeg_pathlib = pathlib.Path(ffmpeg_path)
+    ffprobe_pathlib = pathlib.Path(ffprobe_path)
+    if not ffmpeg_pathlib.exists():
+        raise ValueError(f"Expected a valid path for ffmpeg, got {ffmpeg_path}")
+    if not ffmpeg_pathlib.is_file():
+        raise ValueError(f"Expected a valid file for ffmpeg, got {ffmpeg_path}")
+    if not ffprobe_pathlib.exists():
+        raise ValueError(f"Expected a valid path for ffprobe, got {ffprobe_path}")
+    if not ffprobe_pathlib.is_file():
+        raise ValueError(f"Expected a valid file for ffprobe, got {ffprobe_path}")
+    ffmpeg_folder_path = ffmpeg_pathlib.parent
+    if not ffmpeg_folder_path == ffprobe_pathlib.parent:
+        raise ValueError(
+            f"Expected ffmpeg and ffprobe to be in the same folder, got {str(ffmpeg_pathlib.parent)} and {str(ffprobe_pathlib.parent)}"
+        )
+
+    global FFMPEG_PATH, FFPROBE_PATH, FFMPEG_FOLDER
+    FFMPEG_PATH = ffmpeg_pathlib
+    FFPROBE_PATH = ffprobe_pathlib
+    FFMPEG_FOLDER = ffmpeg_folder_path
