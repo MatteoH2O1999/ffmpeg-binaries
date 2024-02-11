@@ -154,6 +154,36 @@ jobs:
           name: sdist
           path: ./dist
 
+  pr_check:
+    name: PR final check
+    if: ${{ github.event_name != 'release' }}
+    runs-on: ubuntu-latest
+    needs: [lint, tests, package_tests, build_wheels, build_sdist]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: MatteoH2O1999/setup-python@v3
+        with:
+          python-version-file: pyproject.toml
+          cache-build: true
+      - name: Install build requirements
+        run: pip install -r ./requirements-build.txt
+      - name: Install development dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Download built files
+        uses: actions/download-artifact@v4
+        with:
+          path: ./dist
+      - name: Prepare dist folder
+        run: |
+          python ./.github/scripts/prepare_dist.py
+          tree ./dist
+      - name: Check dist files
+        run: twine check ./dist/* --strict
+
   upload_pypi:
     name: Upload package to PyPI
     if: ${{ github.event_name == 'release' }}
