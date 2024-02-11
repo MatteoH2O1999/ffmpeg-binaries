@@ -1,5 +1,6 @@
 import json
 import git
+import os
 import pathlib
 import requests
 import tempfile
@@ -18,17 +19,17 @@ def gather_tags() -> List[str]:
     tags = []
     semantic_tags: List[_SemverVersion] = []
     with tempfile.TemporaryDirectory() as temp_dir:
-        print("Downloading ffmpeg repo...")
+        print("Downloading ffmpeg repo...", flush=True)
         python_repo = git.Repo.clone_from("https://git.ffmpeg.org/ffmpeg.git", temp_dir)
         repo_tags = python_repo.tags
-        print("Extracting tags...")
+        print("Extracting tags...", flush=True)
         for tag in repo_tags:
             tag = tag.name.replace("n", "")
             try:
                 semantic_tags.append(_SemverVersion(tag))
             except ValueError:
                 pass
-    print("Sorting tags...")
+    print("Sorting tags...", flush=True)
     semantic_tags.sort(reverse=True)
     for t in semantic_tags:
         tags.append(str(t))
@@ -51,6 +52,7 @@ def update_binaries(ffmpeg_tags: List[str]):
     print(f"Current binaries:\n{json.dumps(binaries['url'], indent=2)}\n", flush=True)
     current_best = version
     current_url = binaries["url"]
+    set_output("OLD", str(current_best))
     for tag in ffmpeg_tags:
         tag = _SemverVersion(tag)
         if tag <= current_best:
@@ -58,6 +60,7 @@ def update_binaries(ffmpeg_tags: List[str]):
                 f"Already reached latest version with tag {tag}. Stopping...",
                 flush=True,
             )
+            set_output("NEW", str(current_best))
             return
         print(f"::group::Trying with tag {tag}", flush=True)
         candidate = try_version(tag)
@@ -71,6 +74,7 @@ def update_binaries(ffmpeg_tags: List[str]):
         "url": current_url,
     }
     print(f"New version: {current_best}", flush=True)
+    set_output("NEW", str(current_best))
     with open(json_path, "w") as json_file:
         json.dump(new_binaries_json, json_file, indent=2)
 
@@ -128,6 +132,14 @@ def try_url(urls: _BinariesURL) -> bool:
             print("Failed.")
             return False
     return True
+
+
+def set_output(name, output):
+    file_path = os.environ.get("GITHUB_OUTPUT", "")
+    if not file_path:
+        raise ValueError
+    with open(file_path, "a") as file:
+        file.write(f"{name}={output}\n")
 
 
 if __name__ == "__main__":

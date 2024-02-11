@@ -25,15 +25,16 @@ jobs:
         run: pip install -e .
       - name: Install dependencies
         run: pip install -r ./requirements-dev.txt
-      - name: Update JSON binaries
+      - name: Update ffmpeg binaries JSON
+        id: update
         run: python ./.github/scripts/update_binaries.py
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: Update JSON binaries
+          commit-message: Update ffmpeg binaries from v${{ steps.update.outputs.OLD }} to v${{ steps.update.outputs.NEW }}
           branch: create-pull-request/binaries-json
           delete-branch: true
-          title: Update JSON binaries
+          title: Update ffmpeg binaries from v${{ steps.update.outputs.OLD }} to v${{ steps.update.outputs.NEW }}
           body: |
             Automated JSON data update by [update_data.yml](https://github.com/MatteoH2O1999/pyffmpeg/tree/master/.github/workflows/update_data.yml)
           assignees: ${{ github.repository_owner }}
