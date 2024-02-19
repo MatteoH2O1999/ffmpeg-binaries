@@ -8,6 +8,11 @@ from typing import Tuple, Union
 def get_executable_path(
     ensure_binaries: bool = False,
 ) -> Tuple[Union[pathlib.Path, None], Union[pathlib.Path, None]]:
+    """
+    Get ffmpeg executable path
+    :param ensure_binaries: Whether to download binaries if not already present in local folder
+    :return: A tuple (None, None) if no binaries found and ensure_binaries=False, a tuple (ffmpeg_path, ffprobe_path) otherwise
+    """
     binaries_path = get_binaries()
     if binaries_path is None and ensure_binaries:
         warnings.warn("ffmpeg binaries not found. Will download binaries now.")

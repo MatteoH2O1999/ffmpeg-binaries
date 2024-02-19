@@ -14,19 +14,30 @@ else:
     FFMPEG_FOLDER = FFMPEG_PATH.parent
 
 
-def run_as_ffmpeg(command: str) -> None:
+def run_as_ffmpeg(command: str) -> int:
+    """
+    Run the command as ffmpeg
+    :param command: The command to run
+    :return: The command exit code
+    """
     import subprocess
 
-    subprocess.run([FFMPEG_PATH, command])
+    return subprocess.run([FFMPEG_PATH, command]).returncode
 
 
 def init() -> None:
+    """
+    Init ffmpeg global variables
+    """
     global FFMPEG_PATH, FFPROBE_PATH, FFMPEG_FOLDER
     FFMPEG_PATH, FFPROBE_PATH = get_executable_path(ensure_binaries=True)
     FFMPEG_FOLDER = FFMPEG_PATH.parent
 
 
 def add_to_path() -> None:
+    """
+    Add ffmpeg binaries to path
+    """
     import os
 
     if FFMPEG_FOLDER is None:
@@ -35,6 +46,11 @@ def add_to_path() -> None:
 
 
 def use_ffmpeg(ffmpeg_path: str, ffprobe_path: str) -> None:
+    """
+    Use a custom ffmpeg path instead of the builtin one.
+    :param ffmpeg_path: The path to ffmpeg executable
+    :param ffprobe_path: The path to ffprobe executable
+    """
     import pathlib
 
     if not ffmpeg_path or not ffprobe_path:
