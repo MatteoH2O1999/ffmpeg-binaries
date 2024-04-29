@@ -1,4 +1,4 @@
-black==24.4.1
+black==24.4.2
 coverage
 pytest
 GitPython
