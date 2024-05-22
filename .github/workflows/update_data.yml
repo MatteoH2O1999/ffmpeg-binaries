@@ -18,7 +18,7 @@ jobs:
         with:
           ref: master
       - name: Setup Python
-        uses: MatteoH2O1999/setup-python@v3
+        uses: MatteoH2O1999/setup-python@v4
         with:
           python-version-file: pyproject.toml
       - name: Install package in editable mode
