@@ -29,7 +29,7 @@ jobs:
         id: update
         run: python ./.github/scripts/update_binaries.py
       - name: Create or update pull request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: Update ffmpeg binaries from v${{ steps.update.outputs.OLD }} to v${{ steps.update.outputs.NEW }}
           branch: create-pull-request/binaries-json
