@@ -22,9 +22,10 @@ def test_executable_constant_if_binaries_installed():
 
 
 def test_executable_constant_if_binaries_not_installed():
-    with patch(
-        "ffmpeg.executable.get_binaries"
-    ) as mock_get_binaries, warnings.catch_warnings(record=True) as w:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_binaries,
+        warnings.catch_warnings(record=True) as w,
+    ):
         mock_get_binaries.return_value = None
 
         importlib.reload(ffmpeg)
@@ -84,9 +85,10 @@ def test_add_to_path():
 
 
 def test_add_to_path_no_binaries():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch.object(
-        os, "environ", {"PATH": "path1"}
-    ) as mock_environ:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch.object(os, "environ", {"PATH": "path1"}) as mock_environ,
+    ):
         ffmpeg.FFMPEG_PATH = None
         ffmpeg.FFMPEG_FOLDER = None
         ffmpeg.FFPROBE_PATH = None
@@ -142,8 +144,9 @@ def test_use_ffmpeg_fail():
 
 
 def test_use_ffmpeg_success():
-    with patch("pathlib.Path.exists", new=lambda _: True), patch(
-        "pathlib.Path.is_file", new=lambda _: True
+    with (
+        patch("pathlib.Path.exists", new=lambda _: True),
+        patch("pathlib.Path.is_file", new=lambda _: True),
     ):
         b = "newbin/binary"
         p = "newbin/probe"
