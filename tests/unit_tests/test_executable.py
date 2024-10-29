@@ -18,9 +18,10 @@ def test_get_executable_path_success():
 
 
 def test_get_executable_path_failed_no_ensure():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch(
-        "ffmpeg.executable.download_binaries"
-    ) as mock_download:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch("ffmpeg.executable.download_binaries") as mock_download,
+    ):
         mock_get_path.return_value = None
 
         paths = executable.get_executable_path(ensure_binaries=False)
@@ -30,9 +31,10 @@ def test_get_executable_path_failed_no_ensure():
 
 
 def test_get_executable_success_with_download():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch(
-        "ffmpeg.executable.download_binaries"
-    ) as mock_download:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch("ffmpeg.executable.download_binaries") as mock_download,
+    ):
         b = pathlib.Path("binary")
         p = pathlib.Path("probe")
         mock_get_path.side_effect = [None, (b, p)]
@@ -44,9 +46,10 @@ def test_get_executable_success_with_download():
 
 
 def test_get_executable_failed_with_download():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch(
-        "ffmpeg.executable.download_binaries"
-    ) as mock_download:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch("ffmpeg.executable.download_binaries") as mock_download,
+    ):
         mock_get_path.return_value = None
 
         with pytest.raises(RuntimeError):
@@ -55,9 +58,11 @@ def test_get_executable_failed_with_download():
 
 
 def test_run():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch(
-        "subprocess.run"
-    ) as mock_run, patch.object(sys, "argv", ["script", "arg1", "arg2"]):
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch("subprocess.run") as mock_run,
+        patch.object(sys, "argv", ["script", "arg1", "arg2"]),
+    ):
         b = pathlib.Path("binary")
         p = pathlib.Path("probe")
         mock_get_path.return_value = (b, p)
@@ -69,11 +74,12 @@ def test_run():
 
 
 def test_run_no_binaries():
-    with patch("ffmpeg.executable.get_binaries") as mock_get_path, patch(
-        "subprocess.run"
-    ) as mock_run, patch.object(sys, "argv", ["script", "arg1", "arg2"]), patch(
-        "ffmpeg.executable.download_binaries"
-    ) as mock_download:
+    with (
+        patch("ffmpeg.executable.get_binaries") as mock_get_path,
+        patch("subprocess.run") as mock_run,
+        patch.object(sys, "argv", ["script", "arg1", "arg2"]),
+        patch("ffmpeg.executable.download_binaries") as mock_download,
+    ):
         mock_get_path.return_value = None
 
         with pytest.raises(RuntimeError):
