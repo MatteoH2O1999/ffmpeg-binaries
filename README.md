@@ -21,7 +21,7 @@ pip install ffmpeg-binaries
 ## Basic usage
 
 ```python
-import ffmpeg
+import ffmpeg_binaries as ffmpeg
 
 # Initialize module (only if no binaries found)
 ffmpeg.init()

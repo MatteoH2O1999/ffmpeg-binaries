@@ -152,4 +152,4 @@ cython_debug/
 .idea/
 
 # Binaries path
-src/ffmpeg/binaries
+src/ffmpeg_binaries/binaries

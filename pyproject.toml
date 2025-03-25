@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 [project.scripts]
-ffmpeg = "ffmpeg.executable:_run"
+ffmpeg = "ffmpeg_binaries.executable:_run"
 
 [build-system]
 requires = ["setuptools>=43.0.0", "wheel"]
@@ -33,7 +33,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.dynamic]
-version = {attr = "ffmpeg.__version__"}
+version = {attr = "ffmpeg_binaries.__version__"}
 
 [tool.setuptools.package-data]
 "*" = ["*.json"]
