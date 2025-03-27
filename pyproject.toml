@@ -21,6 +21,9 @@ classifiers = [
     'Programming Language :: Python :: 3.13'
 ]
 
+[project.urls]
+MyHomepage = "https://github.com/MatteoH2O1999/ffmpeg-binaries"
+
 [project.scripts]
 ffmpeg = "ffmpeg.executable:_run"
 
