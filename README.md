@@ -35,3 +35,30 @@ other_module.add_ffmpeg(ffmpeg.FFMPEG_PATH)
 # Add directly to path
 ffmpeg.add_to_path()
 ```
+
+## Import name conflict
+
+If another dependency aleady uses the `ffmpeg` import name, like [typed-ffmpeg](https://github.com/livingbio/typed-ffmpeg) or
+[ffmpeg-python](https://github.com/kkroening/ffmpeg-python), you can install the mirror package instead:
+
+```commandline
+pip install ffmpeg-binaries-compat
+```
+
+and use it with the import name `ffmpeg_binaries`:
+
+```python
+import ffmpeg_binaries as ffmpeg
+
+# Initialize module (only if no binaries found)
+ffmpeg.init()
+
+# Call ffmpeg directly
+ffmpeg.run_as_ffmpeg("-h")
+
+# Use the binaries path in other modules
+other_module.add_ffmpeg(ffmpeg.FFMPEG_PATH)
+
+# Add directly to path
+ffmpeg.add_to_path()
+```
