@@ -65,6 +65,17 @@ def test_as_ffmpeg():
         mock_run.assert_called_with([p, "command"])
 
 
+def test_as_ffprobe():
+    with patch("subprocess.run") as mock_run:
+        p = pathlib.Path("binaries")
+        ffmpeg.FFPROBE_PATH = p
+
+        ffmpeg.run_as_ffprobe("command")
+
+        mock_run.assert_called_once()
+        mock_run.assert_called_with([p, "command"])
+
+
 def test_add_to_path():
     with patch.object(os, "environ", {"PATH": "path1"}) as mock_environ:
         b = pathlib.Path("bin/binary")
