@@ -25,6 +25,17 @@ def run_as_ffmpeg(command: str) -> int:
     return subprocess.run([FFMPEG_PATH, command]).returncode
 
 
+def run_as_ffprobe(command: str) -> int:
+    """
+    Run the command as ffprobe
+    :param command: The command to run
+    :return: The command exit code
+    """
+    import subprocess
+
+    return subprocess.run([FFPROBE_PATH, command]).returncode
+
+
 def init() -> None:
     """
     Init ffmpeg global variables
