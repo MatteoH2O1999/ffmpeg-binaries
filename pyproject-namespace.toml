@@ -28,7 +28,7 @@ MyHomepage = "https://github.com/MatteoH2O1999/ffmpeg-binaries"
 ffmpeg = "ffmpeg_binaries.executable:_run"
 
 [build-system]
-requires = ["setuptools>=43.0.0", "wheel"]
+requires = ["setuptools>=70.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-dir]
