@@ -31,6 +31,9 @@ ffmpeg.init()
 # Call ffmpeg directly
 ffmpeg.run_as_ffmpeg("-h")
 
+# Call ffprobe directly
+ffmpeg.run_as_ffprobe("-h")
+
 # Use the binaries path in other modules
 other_module.add_ffmpeg(ffmpeg.FFMPEG_PATH)
 
@@ -57,6 +60,9 @@ ffmpeg.init()
 
 # Call ffmpeg directly
 ffmpeg.run_as_ffmpeg("-h")
+
+# Call ffprobe directly
+ffmpeg.run_as_ffprobe("-h")
 
 # Use the binaries path in other modules
 other_module.add_ffmpeg(ffmpeg.FFMPEG_PATH)
