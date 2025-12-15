@@ -125,7 +125,7 @@ jobs:
         run: ./.github/scripts/build.ps1 --wheel
         shell: pwsh
       - name: Upload wheel
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: wheel-${{ matrix.os }}
           path: ./dist
@@ -153,7 +153,7 @@ jobs:
         env:
           BUILD: universal
       - name: Upload universal wheel and sdist
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: sdist
           path: ./dist
