@@ -1,9 +1,13 @@
+import logging
 import os
 import pathlib
 import shutil
 
 from typing import Union
 from .downloader import _Downloader
+
+
+logger = logging.getLogger(__name__)
 
 
 class _NixDownloader(_Downloader):
@@ -17,10 +21,10 @@ class _NixDownloader(_Downloader):
         for path in os.listdir(directory):
             complete_file = directory.joinpath(path)
             shutil.move(complete_file, self.dst)
-            print(f"Moved {complete_file} to {self.dst}", flush=True)
-        print(f"Extracted content from {directory} to {self.dst}", flush=True)
+            logger.info(f"Moved {complete_file} to {self.dst}")
+        logger.info(f"Extracted content from {directory} to {self.dst}")
         shutil.rmtree(directory)
-        print(f"Removed {directory}", flush=True)
+        logger.info(f"Removed {directory}")
 
     @property
     def ffmpeg(self) -> Union[bytes, str, os.PathLike]:
