@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 import pathlib
@@ -6,6 +7,9 @@ import requests
 
 from abc import ABC, abstractmethod
 from typing import List, Union
+
+
+logger = logging.getLogger(__name__)
 
 
 class _Downloader(ABC):
@@ -18,11 +22,11 @@ class _Downloader(ABC):
             for link in self.url:
                 filename = link.split("/")[-1]
                 filepath = pathlib.Path(tmp_dir).joinpath(filename)
-                print(f"Downloading {link} to file {filepath}...", flush=True)
+                logger.info(f"Downloading {link} to file {filepath}...")
                 response = requests.get(link)
                 with open(filepath, "wb") as file:
                     file.write(response.content)
-                print(f"Extracting archive {filepath} to {self.dst}...", flush=True)
+                logger.info(f"Extracting archive {filepath} to {self.dst}...")
                 patoolib.extract_archive(str(filepath), outdir=str(self.dst))
         self.extract()
 
