@@ -118,6 +118,28 @@ def test_add_to_path_no_binaries():
         assert actual == expected
 
 
+def test_is_on_path():
+    with patch.object(os, "environ", {"PATH": "path1"}) as mock_environ:
+        ffmpeg.FFMPEG_PATH = None
+        ffmpeg.FFMPEG_FOLDER = None
+        ffmpeg.FFPROBE_PATH = None
+
+        assert ffmpeg.is_on_path() is False
+
+        b = pathlib.Path("bin/binary")
+        p = pathlib.Path("bin/probe")
+
+        ffmpeg.FFMPEG_PATH = b
+        ffmpeg.FFMPEG_FOLDER = b.parent
+        ffmpeg.FFPROBE_PATH = p
+
+        assert ffmpeg.is_on_path() is False
+
+        ffmpeg.add_to_path()
+
+        assert ffmpeg.is_on_path() is True
+
+
 def test_use_ffmpeg_null_ffmpeg_path():
     b = "bin/binary"
     p = None

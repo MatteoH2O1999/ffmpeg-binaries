@@ -2,7 +2,7 @@ import warnings
 
 from .executable import get_executable_path
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 FFMPEG_PATH, FFPROBE_PATH = get_executable_path()
 if FFMPEG_PATH is None:
@@ -47,13 +47,24 @@ def init() -> None:
 
 def add_to_path() -> None:
     """
-    Add ffmpeg binaries to path
+    Add ffmpeg binaries to path by prepending FFMPEG_FOLDER to PATH
     """
     import os
 
     if FFMPEG_FOLDER is None:
         init()
     os.environ["PATH"] = f"{str(FFMPEG_FOLDER)}{os.pathsep}{os.environ['PATH']}"
+
+
+def is_on_path() -> bool:
+    """
+    Check whether FFMPEG_FOLDER is already on PATH (not whether it is the first, so other ffmpeg installations may have priority)
+    """
+    import os
+
+    if FFMPEG_FOLDER is None:
+        return False
+    return str(FFMPEG_FOLDER) in os.environ["PATH"].split(os.pathsep)
 
 
 def use_ffmpeg(ffmpeg_path: str, ffprobe_path: str) -> None:
