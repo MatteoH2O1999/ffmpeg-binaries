@@ -178,7 +178,7 @@ jobs:
       - name: Install development dependencies
         run: pip install -r requirements-dev.txt
       - name: Download built files
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ./dist
       - name: Prepare dist folder
@@ -211,7 +211,7 @@ jobs:
       - name: Install development dependencies
         run: pip install -r requirements-dev.txt
       - name: Download built files
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: ./dist
       - name: Prepare dist folder
